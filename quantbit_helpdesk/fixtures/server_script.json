@@ -1,0 +1,21 @@
+[
+ {
+  "allow_guest": 0,
+  "api_method": null,
+  "cron_format": null,
+  "disabled": 0,
+  "docstatus": 0,
+  "doctype": "Server Script",
+  "doctype_event": "Before Save",
+  "enable_rate_limit": 0,
+  "event_frequency": "All",
+  "modified": "2025-07-09 02:29:36.309954",
+  "module": "Quantbit Helpdesk",
+  "name": "Helpdesk Automations",
+  "rate_limit_count": 5,
+  "rate_limit_seconds": 86400,
+  "reference_doctype": "HD Ticket",
+  "script": "if doc.custom_department == \"Technical\":\r\n    doc.agent_group = \"Technical Team\"\r\nelif doc.custom_department == \"Accounts\":\r\n    doc.agent_group = \"Billing\"\r\nelif doc.custom_department == \"Functional Team\":\r\n    doc.agent_group = \"Functional\"\r\n",
+  "script_type": "DocType Event"
+ }
+]

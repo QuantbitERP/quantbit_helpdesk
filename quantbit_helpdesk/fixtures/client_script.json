@@ -1,0 +1,24 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "HD Ticket",
+  "enabled": 1,
+  "modified": "2025-07-09 02:16:32.248810",
+  "module": "Quantbit Helpdesk",
+  "name": "HD Field Dependency",
+  "script": "frappe.ui.form.on(\"HD Ticket\", {\r\n  onload(frm) {\r\n    toggle_subdepartment(frm);\r\n  },\r\n  custom_department(frm) {\r\n    toggle_subdepartment(frm);\r\n  }\r\n});\r\n\r\nfunction toggle_subdepartment(frm) {\r\n  if (frm.doc.custom_department === \"Technical\" || frm.doc.custom_department === \"Functional\") {\r\n    frm.set_df_property(\"custom_sub_department\", \"hidden\", false);\r\n  } else {\r\n    frm.set_df_property(\"custom_sub_department\", \"hidden\", true);\r\n  }\r\n}\r\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "HD Ticket",
+  "enabled": 1,
+  "modified": "2025-07-09 02:16:46.263932",
+  "module": "Quantbit Helpdesk",
+  "name": "HD Ticket Module Selection",
+  "script": "frappe.ui.form.on('HD Ticket', {\n        custom_module: function(frm) {\n    \n        frm.set_query(\"custom_sub_module\", function() {\n            return {\n                filters: {\n                    module: frm.doc.custom_module\n                }\n            };\n        });\n\n       \n        frm.set_value(\"custom_sub_module\", \"\");\n    },\n\n    onload: function(frm) {\n        if (frm.doc.module) {\n            frm.set_query(\"custom_sub_module\", function() {\n                return {\n                    filters: {\n                        module: frm.doc.custom_module\n                    }\n                };\n            });\n        }\n    }\n\n})",
+  "view": "Form"
+ }
+]
