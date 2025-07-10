@@ -263,16 +263,15 @@ def get_ticket_type_and_agent():
         }
 
 
-@frappe.whitelist(allow_guest=True)  
-def get_submodules_by_module(module_name):
-    if not module_name:
-        return []
-
-    submodules = frappe.get_all(
-        "SubModule",
-        filters={"module": module_name},
-        fields=["name", "submodule_name"],
-        order_by="submodule_name asc"
+@frappe.whitelist()
+def get_communications(name):
+    communications = frappe.get_all(
+        "Communication",
+        filters={
+            "reference_doctype": "HD Ticket",
+            "reference_name": name
+        },
+        fields=["name", "communication_type", "content", "subject", "sender", "creation"],
+        order_by="creation asc"
     )
-    return submodules
-
+    return communications
