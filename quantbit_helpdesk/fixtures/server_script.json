@@ -9,13 +9,13 @@
   "doctype_event": "Before Save",
   "enable_rate_limit": 0,
   "event_frequency": "All",
-  "modified": "2025-07-09 02:29:36.309954",
+  "modified": "2025-07-11 04:35:06.054073",
   "module": "Quantbit Helpdesk",
   "name": "Helpdesk Automations",
   "rate_limit_count": 5,
   "rate_limit_seconds": 86400,
   "reference_doctype": "HD Ticket",
-  "script": "if doc.custom_department == \"Technical\":\r\n    doc.agent_group = \"Technical Team\"\r\nelif doc.custom_department == \"Accounts\":\r\n    doc.agent_group = \"Billing\"\r\nelif doc.custom_department == \"Functional Team\":\r\n    doc.agent_group = \"Functional\"\r\n",
+  "script": "if doc.custom_department == \"Technical\":\r\n    doc.agent_group = \"Technical Team\"\r\nelif doc.custom_department == \"Accounts\":\r\n    doc.agent_group = \"Accounts Team\"\r\nelif doc.custom_department == \"Functional Team\":\r\n    doc.agent_group = \"Functional\"\r\nelif doc.custom_department == \"Sales Team\":\r\n    doc.agent_group = \"Sales\"\r\nelif doc.custom_department == \"Admin Team\":\r\n    doc.agent_group = \"Admin\"\r\nelif doc.custom_department == \"HR Team\":\r\n    doc.agent_group = \"HR\"\r\n    \r\n    \r\n\r\n",
   "script_type": "DocType Event"
  }
 ]
