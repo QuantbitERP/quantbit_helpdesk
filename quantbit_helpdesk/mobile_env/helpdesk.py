@@ -20,7 +20,7 @@ def get_hd_tickets(user=None, status=None, priority=None, limit=20):
             fields=[
                 "name", "subject", "status", "priority", "creation",
                 "agent_group", "ticket_type", "opening_date", 
-                "resolution_date", "_assign"
+                "resolution_date", "_assign","description"
             ],
             filters=filters,
             limit_page_length=limit,
@@ -170,7 +170,9 @@ def get_helpdesk_masters():
             'contacts': [c["name"] for c in frappe.get_all("Contact", fields=["name"])],
             'customers': [c["name"] for c in frappe.get_all("HD Customer", fields=["name"])],
             'sla': [s["name"] for s in frappe.get_all("HD Service Level Agreement", fields=["name"])],
-            'email_accounts': [ea["name"] for ea in frappe.get_all("Email Account", fields=["name"])] 
+            'email_accounts': [ea["name"] for ea in frappe.get_all("Email Account", fields=["name"])],
+            'feedback_options': [ea["name"] for ea in frappe.get_all("HD Ticket Feedback Option", fields=["name"])]
+
         }
         return {
             "status": "success",
@@ -274,4 +276,75 @@ def get_communications(name):
         fields=["name", "communication_type", "content", "subject", "sender", "creation"],
         order_by="creation asc"
     )
+
+    for comm in communications:
+        # Get files attached to this communication
+        files = frappe.get_all(
+            "File",
+            filters={
+                "attached_to_doctype": "Communication",
+                "attached_to_name": comm["name"]
+            },
+            fields=["file_url", "file_name"]
+        )
+        comm["attachments"] = files
+
     return communications
+
+
+
+import frappe
+from frappe.utils import nowdate
+
+@frappe.whitelist()
+def create_or_update_communication(**kwargs):
+    data = kwargs
+
+    required_fields = ["reference_doctype", "reference_name", "communication_type", "communication_medium", "content"]
+    for field in required_fields:
+        if not data.get(field):
+            raise frappe.ValidationError(f"Missing required field: {field}")
+
+    communication_data = {
+        "reference_doctype": data["reference_doctype"],
+        "reference_name": data["reference_name"],
+        "communication_type": data["communication_type"],
+        "communication_medium": data["communication_medium"],
+        "content": data["content"],
+        "subject": data.get("subject"),
+       
+    }
+
+    # Update existing communication if name is given
+    if data.get("name"):
+        if not frappe.db.exists("Communication", data["name"]):
+            raise frappe.DoesNotExistError("Communication does not exist.")
+
+        comm_doc = frappe.get_doc("Communication", data["name"])
+        if comm_doc.docstatus == 1:
+            raise frappe.ValidationError("Cannot modify a submitted Communication.")
+
+        for key, value in communication_data.items():
+            if value is not None:
+                setattr(comm_doc, key, value)
+
+        comm_doc.save()
+    else:
+        # Create new communication
+        comm_doc = frappe.get_doc({
+            "doctype": "Communication",
+            **{k: v for k, v in communication_data.items() if v is not None}
+        })
+        comm_doc.insert()
+
+    # Attach files if any
+    if data.get("attachments"):
+        for file in data["attachments"]:
+            if not frappe.db.exists("File", file.get("name")):
+                raise frappe.DoesNotExistError(f"File not found: {file.get('name')}")
+            file_doc = frappe.get_doc("File", file["name"])
+            file_doc.attached_to_doctype = "Communication"
+            file_doc.attached_to_name = comm_doc.name
+            file_doc.save()
+
+    return comm_doc
